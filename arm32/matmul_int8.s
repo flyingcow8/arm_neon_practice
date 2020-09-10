@@ -31,39 +31,36 @@
 //void MatmulInt8Neon32(const int8_t *a, const int8_t *b, int8_t *dst, int row, int col, int deep16, 
 //                      const int *input_sums, const int *weight_bias, int act_min, int act_max, int out_zp,
 //                      int multiplier, int left_shift, int right_shift, int stride);
-// r0: a, r1: b, r2: dst, r3: row
-// #0: col, #4: deep16, #8: input_sums, #12: weight_bias, #16: act_min, #20: act_max, #24: out_zp
+// #0: a, #4: b, #8: dst, #12: row
+// #16: col, #20: deep16, #24: input_sums, #28: weight_bias, #32: act_min, #36: act_max, #40: out_zp
 // #28: multiplier, #32: left_shift, #36: right_shift, #40: stride
-// custom params:
-// #44: a_origin, #48: b_origin, #52: row_origin
 
 MatmulInt8Neon32:
+  push {r0-r3}
   push {r4-r11, lr}
   vpush {q4-q7}
   add sp, sp, #100    //36+64
 
-  ldr r4, [sp]        // col
-  str r0, [sp, #44]   // origin a
-  str r1, [sp, #48]   // origin b
-  str r3, [sp, #52]   // origin row
+  ldr r2, [sp, #8]      // dst ptr
+  ldr r4, [sp, #16]     // col
   mov r7, #2
-  ldr r8, [sp, #4]
-  mul r9, r7, r8      // the sride of b
+  ldr r8, [sp, #20]     // deep16
+  mul r9, r7, r8        // the sride of b
 
 L1:
   cmp r4, #0    // if at the end of col
   ble End1
 
-  ldr r0, [sp, #44]   // reload a ptr
-  ldr r3, [sp, #52]   // reset row counter
-  ldr r6, [sp, #8]    // reload intpu_sums ptr
+  ldr r0, [sp]        // reload a ptr
+  ldr r3, [sp, #12]   // reset row counter
+  ldr r6, [sp, #24]    // reload intpu_sums ptr
 L2:
   cmp r3, #0    // if at the end of row
   ble End2
 
-  ldr r1, [sp, #48]   // reload b ptr
-  ldr r4, [sp, #12]   // reload weight_bias ptr
-  ldr r5, [sp, #4]    // reset deep16
+  ldr r1, [sp, #4]    // reload b ptr
+  ldr r4, [sp, #28]   // reload weight_bias ptr
+  ldr r5, [sp, #20]   // reset deep16
   vmov.i32 q6, #0
   vmov.i32 q7, #0
   vmov.i32 q8, #0
@@ -142,5 +139,6 @@ End1:
   sub sp, sp, #100
   vpop {q4-q7}
   pop {r4-r11, pc}
+  pop {r0-r3}
 #endif
 #endif
