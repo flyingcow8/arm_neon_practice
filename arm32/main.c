@@ -74,7 +74,7 @@ void Row4x2Major2RowMajor(int8_t *src, int row4, int8_t *dst, int row, int cow) 
   }
 }
 
-void test() {
+void test4x2() {
   int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5};
   int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1};
   int a_sums[ROW4] = {0};
@@ -106,6 +106,35 @@ void test() {
 #endif
 
   Row4x2Major2RowMajor(c, ROW4, output, ROW, COL);
+  for (int i = 0; i < ROW * COL; ++i) {
+    printf("%d ", output[i]);
+    if ((i + 1) % COL == 0) printf("\n");
+  }
+  printf("\n");
+}
+
+void test() {
+  int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5};
+  int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1};
+  int a_sums[ROW4] = {0};
+  int b_sums[COL2] = {0};
+
+  int8_t output[ROW * COL] = {0};
+  int8_t *a_align = (int8_t *)malloc(ROW4 * DEPTH16);
+  memset(a_align, 0, ROW4 * DEPTH16);
+  int8_t *b_align = (int8_t *)malloc(COL2 * DEPTH16);
+  memset(b_align, 0, COL2 * DEPTH16);
+
+  RowMajor2Row4x16Major(a, ROW, DEPTH, a_align, DEPTH16);
+  RowMajor2Col16x2Major(b, DEPTH, COL, b_align, DEPTH16);
+  // RowMajor2Asums(a, ROW, DEPTH, 0, a_sums);
+  // RowMajor2Bbias(b, DEPTH, COL, 0, 0, NULL, b_sums);
+  int multiplier;
+  int shift;
+  // QuantizeMultiplier(1.0f, &multiplier, &shift);
+
+  MatmulInt8Neon32(a_align, b_align, output, ROW, COL, DEPTH16, a_sums, b_sums, INT_MIN, INT_MAX, 0, multiplier, 0, 0, COL);
+
   for (int i = 0; i < ROW * COL; ++i) {
     printf("%d ", output[i]);
     if ((i + 1) % COL == 0) printf("\n");

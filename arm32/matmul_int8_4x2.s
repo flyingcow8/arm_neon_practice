@@ -40,11 +40,11 @@ MatmulInt8Neon32:
   vpush {q4-q7}
   add sp, sp, #116
   
+  ldr r2, [sp, #-44]     // dst ptr
   ldr r4, [sp]            // col
   mov r7, #2
   ldr r8, [sp, #4]        // deep16
   mul r9, r7, r8          // the sride of b
-  ldr r7, [sp, #40]       // output stride
 
 L1:
   cmp r4, #0    // if at the end of col
@@ -57,7 +57,7 @@ L2:
   cmp r3, #0    // if at the end of row
   ble End2
 
-  ldr r1, [sp, #-48]    // reload b ptr
+  ldr r1, [sp, #-48]   // reload b ptr
   ldr r7, [sp, #12]     // reload weight_bias ptr
   ldr r5, [sp, #4]      // reset deep16
   vmov.i32 q6, #0
@@ -129,52 +129,15 @@ End3:
   // Cast-and-saturate from int16 to int8
   vqmovn.s16 d30, q14
 
-  // start to write
-  ldr r2, [sp, #-44]      // dst ptr
-  cmp r4, #2
-  beq WriteCol2
-  cmp r4, #1
-  beq WriteCol1
-  b EndWrite
-
-WriteCol2:
-  vst1.16 {d30[0]}, [r2], r7  
-  cmp r3, #1
-  beq EndWrite
-  vst1.16 {d30[1]}, [r2], r7  
-  cmp r3, #2
-  beq EndWrite  
-  vst1.16 {d30[2]}, [r2], r7  
-  cmp r3, #3
-  beq EndWrite  
-  vst1.16 {d30[2]}, [r2], r7  
-  b EndWrite
-
-WriteCol1:
-  vst1.8 {d30[0]}, [r2], r7  
-  cmp r3, #1
-  beq EndWrite
-  vst1.8 {d30[2]}, [r2], r7  
-  cmp r3, #2
-  beq EndWrite
-  vst1.8 {d30[4]}, [r2], r7  
-  cmp r3, #3
-  beq EndWrite
-  vst1.8 {d30[6]}, [r2], r7  
-  b EndWrite
-
-EndWrite:
+  vst1.8 {d30}, [r2]!
   sub r3, r3, #4   // a row counter -= 4
   b L2
 
 End2:
-  sub r4, r4, #2      // b col counter -= 2
-  ldr r1, [sp, #-48]  // b ptr + stride
-  add r1, r1, r9    
+  sub r4, r4, #2    // b col counter -= 2
+  ldr r1, [sp, #-48]
+  add r1, r1, r9    // b ptr + stride
   str r1, [sp, #-48]
-  ldr r2, [sp, #-44]  // dst ptr + offset
-  add r2, r2, #2
-  str r2, [sp, #-44]
   b L1
 
 End1:
