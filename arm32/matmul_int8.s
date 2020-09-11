@@ -123,10 +123,14 @@ End3:
 
   //...
 
+  // Cast-and-saturate from int32 to int16
   vqmovn.s32 d28, q14
   vqmovn.s32 d29, q15
-  
-  vst1.16 {q14}, [r2]!
+
+  // Cast-and-saturate from int16 to int8
+  vqmovn.s16 d30, q14
+
+  vst1.8 {d30}, [r2]!
   sub r3, r3, #4   // a row counter -= 4
   b L2
 
