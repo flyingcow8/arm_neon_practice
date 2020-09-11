@@ -9,7 +9,7 @@
 
 #define ROW 5
 #define COL 5
-#define DEPTH 5
+#define DEPTH 1
 #define ROW4 UP_ROUND(ROW, 4)
 #define COL2 UP_ROUND(COL, 2)
 #define DEPTH16 UP_ROUND(DEPTH, 16)
@@ -75,8 +75,8 @@ void Row4x2Major2RowMajor(int8_t *src, int row4, int8_t *dst, int row, int cow) 
 }
 
 void test() {
-  int8_t a[ROW * DEPTH] = {-3, -5, -4, -3, -2, -3, -1, -2, -3, 0, -5, 1, -1, -5, -1, 4, -2, 3, -3, -5, 3, 2, -1, -1, 2};
-  int8_t b[DEPTH * COL] = {1, -3, 5, -3, 2, 4, 2, 4, 2, 3, 2, -2, 4, -1, -1, 5, -1, 5, 1, 2, -1, -3, -5, 2, 3};
+  int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5};
+  int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1};
   int a_sums[ROW4] = {0};
   int b_sums[COL2] = {0};
 
