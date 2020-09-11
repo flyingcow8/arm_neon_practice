@@ -31,8 +31,8 @@
 //void MatmulInt8Neon32(const int8_t *a, const int8_t *b, int8_t *dst, int row, int col, int deep16, 
 //                      const int *input_sums, const int *weight_bias, int act_min, int act_max, int out_zp,
 //                      int multiplier, int left_shift, int right_shift, int stride);
-// #0: a, #4: b, #8: dst, #12: row
-// #16: col, #20: deep16, #24: input_sums, #28: weight_bias, #32: act_min, #36: act_max, #40: out_zp
+// #-52: a, #-48: b, #-44: dst, #-40: row
+// #0: col, #4: deep16, #8: input_sums, #12: weight_bias, #16: act_min, #20: act_max, #24: out_zp
 // #28: multiplier, #32: left_shift, #36: right_shift, #40: stride
 
 MatmulInt8Neon32:
@@ -40,26 +40,26 @@ MatmulInt8Neon32:
   vpush {q4-q7}
   add sp, sp, #116
   
-  ldr r2, [sp, #8]      // dst ptr
-  ldr r4, [sp, #16]     // col
+  ldr r2, [sp, #-44]     // dst ptr
+  ldr r4, [sp]            // col
   mov r7, #2
-  ldr r8, [sp, #20]     // deep16
-  mul r9, r7, r8        // the sride of b
+  ldr r8, [sp, #4]        // deep16
+  mul r9, r7, r8          // the sride of b
 
 L1:
   cmp r4, #0    // if at the end of col
   ble End1
 
-  ldr r0, [sp]        // reload a ptr
-  ldr r3, [sp, #12]   // reset row counter
-  ldr r6, [sp, #24]    // reload intpu_sums ptr
+  ldr r0, [sp, #-52]   // reload a ptr
+  ldr r3, [sp, #-40]   // reset row counter
+  ldr r6, [sp, #8]      // reload intpu_sums ptr
 L2:
   cmp r3, #0    // if at the end of row
   ble End2
 
-  ldr r1, [sp, #4]    // reload b ptr
-  ldr r7, [sp, #28]   // reload weight_bias ptr
-  ldr r5, [sp, #20]   // reset deep16
+  ldr r1, [sp, #-48]   // reload b ptr
+  ldr r7, [sp, #12]     // reload weight_bias ptr
+  ldr r5, [sp, #4]      // reset deep16
   vmov.i32 q6, #0
   vmov.i32 q7, #0
   vmov.i32 q8, #0
@@ -134,10 +134,10 @@ End3:
   b L2
 
 End2:
-  sub r4, r4, #2  // b col counter -= 2
-  ldr r1, [sp, #4]
-  add r1, r1, r9  // b ptr + stride
-  str r1, [sp, #4]
+  sub r4, r4, #2    // b col counter -= 2
+  ldr r1, [sp, #-48]
+  add r1, r1, r9    // b ptr + stride
+  str r1, [sp, #-48]
   b L1
 
 End1:

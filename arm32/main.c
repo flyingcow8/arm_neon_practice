@@ -95,9 +95,7 @@ void test() {
   int shift;
   // QuantizeMultiplier(1.0f, &multiplier, &shift);
 
-  printf("1/%p, %p, %p\n", a_align, b_align, &c[0]);
   MatmulInt8Neon32(a_align, b_align, c, ROW, COL, DEPTH16, a_sums, b_sums, INT_MIN, INT_MAX, 0, multiplier, 0, 0, 0);
-  printf("2/%p, %p, %p\n", a_align, b_align, &c[0]);
 
 #if 1  // test start
   for (int i = 0; i < ROW4 * COL2; ++i) {
