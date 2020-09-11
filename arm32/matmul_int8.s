@@ -70,7 +70,7 @@ L2:
   vmov.i32 q12, #0
   vmov.i32 q13, #0
 L3:
-  cmp r3, #0
+  cmp r5, #0
   beq End3
 
   vld1.8 {d0, d1, d2, d3}, [r0]!
@@ -99,10 +99,10 @@ L3:
   vmlal.s8 q15, d3, d9
   vmlal.s8 q3, d3, d11
 
-  vpadal.s16 q6, q14
-  vpadal.s16 q7, q2
-  vpadal.s16 q8, q15
-  vpadal.s16 q9, q3
+  vpadal.s16 q10, q14
+  vpadal.s16 q11, q2
+  vpadal.s16 q12, q15
+  vpadal.s16 q13, q3
   sub r5, r5, #16  // deep16 -= 16
   b L3
 

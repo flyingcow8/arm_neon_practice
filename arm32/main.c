@@ -8,7 +8,7 @@
 #define UP_ROUND(x, y) (((x) + (y) - (1)) / (y) * (y))
 
 #define ROW 4
-#define COL 4
+#define COL 2
 #define DEPTH 1
 #define ROW4 UP_ROUND(ROW, 4)
 #define COL2 UP_ROUND(COL, 2)
@@ -76,7 +76,7 @@ void Row4x2Major2RowMajor(int8_t *src, int row4, int8_t *dst, int row, int cow) 
 
 void test() {
   int8_t a[ROW * DEPTH] = {1, 2, 3, 4};
-  int8_t b[DEPTH * COL] = {1, 1, 1, 1};
+  int8_t b[DEPTH * COL] = {1, 1};
   int a_sums[ROW4] = {0};
   int b_sums[COL2] = {0};
 
