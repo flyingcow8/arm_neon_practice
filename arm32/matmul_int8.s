@@ -136,7 +136,7 @@ End3:
 
 End2:
   sub r4, r4, #2  // b col counter -= 2
-  add r1, r1, r9  // b ptr + stride
+  //add r1, r1, r9  // b ptr + stride
   str r1, [sp, #4]
   b L1
 
