@@ -39,7 +39,7 @@ MatmulInt8Neon32:
   push {r0-r11, lr}
   vpush {q4-q7}
   add sp, sp, #116
-  
+
   ldr r4, [sp]            // col
   mov r7, #2
   ldr r8, [sp, #4]        // deep16
@@ -58,7 +58,7 @@ L2:
   ble End2
 
   ldr r1, [sp, #-48]    // reload b ptr
-  ldr r7, [sp, #12]     // reload weight_bias ptr
+  ldr r8, [sp, #12]     // reload weight_bias ptr
   ldr r5, [sp, #4]      // reset deep16
   vmov.i32 q6, #0
   vmov.i32 q7, #0
@@ -120,7 +120,67 @@ End3:
   vpadd.i32 d30, d4, d5
   vpadd.i32 d31, d6, d7
 
-  //...
+/* 
+  // Add weight_bias
+  vld1.32 {d26}, [r8]!
+  vadd.i32 d28, d28, d26
+  vadd.i32 d29, d29, d26
+  vadd.i32 d30, d30, d26
+  vadd.i32 d31, d31, d26
+
+  // Substract input_sums
+  vld1.32 {d24, d25}, [r6]!
+  vdup.32 d20, d24[0]
+  vdup.32 d21, d24[1]
+  vdup.32 d22, d25[0]
+  vdup.32 d23, d25[1]
+  vsub.s32 d28, d28, d20
+  vsub.s32 d29, d29, d21
+  vsub.s32 d30, d30, d22
+  vsub.s32 d31, d31, d23
+
+  // Apply left shift
+  ldr r10, [sp, #32]
+  vdup.32 q9, r10
+  vshl.s32 q14, q14, q9
+  vshl.s32 q15, q15, q9
+
+  // Apply the fixed-point part of the multiplier
+  ldr r10, [sp, #28]
+  vdup.32 q8, r10
+  vqrdmulh.s32 q14, q14, q8
+  vqrdmulh.s32 q15, q15, q8
+
+  // Apply right shift
+  ldr r10, [sp, #36]
+  vdup.32 q7, r10
+  vand q6, q7, q14
+  vshr.s32 q6, q6, #31
+  vqadd.s32 q14, q14, q6
+  vrshl.s32 q14, q14, q7
+  vand q5, q7, q15
+  vshr.s32 q5, q5, #31
+  vqadd.s32 q15, q15, q5
+  vrshl.s32 q15, q15, q7
+
+  // Add the destination zero point
+  ldr r10, [sp, #24]
+  vdup.32 q4, r10
+  vadd.i32 q14, q14, q4
+  vadd.i32 q15, q15, q4
+
+  // Apply the act_min bound
+  ldr r10, [sp, #16]
+  vdup.32 q3, r10
+  vmax.s32 q14, q14, q3
+  vmax.s32 q15, q15, q3
+
+  // Apply the act_max bound
+  ldr r10, [sp, #20]
+  vdup.32 q2, r10
+  vmin.s32 q14, q14, q2
+  vmin.s32 q15, q15, q2
+*/
 
   // Cast-and-saturate from int32 to int16
   vqmovn.s32 d28, q14
@@ -130,8 +190,6 @@ End3:
   vqmovn.s16 d30, q14
 
   // start to write
-  ldr r2, [sp, #-44]      // dst ptr
-  
   cmp r4, #2
   bge WriteCol2
   cmp r4, #1
@@ -148,7 +206,7 @@ WriteCol2:
   vst1.16 {d30[2]}, [r2], r7  
   cmp r3, #3
   beq EndWrite  
-  vst1.16 {d30[2]}, [r2], r7  
+  vst1.16 {d30[3]}, [r2], r7  
   b EndWrite
 
 WriteCol1:
@@ -173,6 +231,9 @@ End2:
   ldr r1, [sp, #-48]  // b ptr + stride
   add r1, r1, r9    
   str r1, [sp, #-48]
+  ldr r8, [sp, #12]   // weight_bias + stride
+  add r8, r8, #8
+  str r8, [sp, #12]
   ldr r2, [sp, #-44]  // dst ptr + offset
   add r2, r2, #2
   str r2, [sp, #-44]

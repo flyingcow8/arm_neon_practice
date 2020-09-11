@@ -115,14 +115,14 @@ void test4x2() {
 #endif
 
 void test() {
-#define ROW 4
-#define COL 2
+#define ROW 6
+#define COL 4
 #define DEPTH 1
 #define ROW4 UP_ROUND(ROW, 4)
 #define COL2 UP_ROUND(COL, 2)
 #define DEPTH16 UP_ROUND(DEPTH, 16)
-  int8_t a[ROW * DEPTH] = {1, 2, 3, 4};
-  int8_t b[DEPTH * COL] = {1, 1};
+  int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5, 6};
+  int8_t b[DEPTH * COL] = {1, 1, 1, 1};
   int a_sums[ROW4] = {0};
   int b_sums[COL2] = {0};
 
