@@ -9,7 +9,7 @@
 
 #define ROW 5
 #define COL 5
-#define DEPTH 2
+#define DEPTH 1
 #define ROW4 UP_ROUND(ROW, 4)
 #define COL2 UP_ROUND(COL, 2)
 #define DEPTH16 UP_ROUND(DEPTH, 16)
@@ -75,8 +75,8 @@ void Row4x2Major2RowMajor(int8_t *src, int row4, int8_t *dst, int row, int cow) 
 }
 
 void test() {
-  int8_t a[ROW * DEPTH] = {1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
-  int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+  int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5};
+  int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1};
   int a_sums[ROW4] = {0};
   int b_sums[COL2] = {0};
 
@@ -95,7 +95,9 @@ void test() {
   int shift;
   // QuantizeMultiplier(1.0f, &multiplier, &shift);
 
+  printf("1/%p, %p, %p\n", a_align, b_align, &c[0]);
   MatmulInt8Neon32(a_align, b_align, c, ROW, COL, DEPTH16, a_sums, b_sums, INT_MIN, INT_MAX, 0, multiplier, 0, 0, 0);
+  printf("2/%p, %p, %p\n", a_align, b_align, &c[0]);
 
 #if 1  // test start
   for (int i = 0; i < ROW4 * COL2; ++i) {

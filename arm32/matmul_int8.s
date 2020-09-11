@@ -36,11 +36,10 @@
 // #28: multiplier, #32: left_shift, #36: right_shift, #40: stride
 
 MatmulInt8Neon32:
-  push {r0-r3}
-  push {r4-r11, lr}
+  push {r0-r11, lr}
   vpush {q4-q7}
-  add sp, sp, #100    //36+64
-
+  add sp, sp, #116
+  
   ldr r2, [sp, #8]      // dst ptr
   ldr r4, [sp, #16]     // col
   mov r7, #2
@@ -142,9 +141,8 @@ End2:
   b L1
 
 End1:
-  sub sp, sp, #100
+  sub sp, sp, #116
   vpop {q4-q7}
-  pop {r4-r11, pc}
-  pop {r0-r3}
+  pop {r0-r11, pc}
 #endif
 #endif
