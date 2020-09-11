@@ -131,8 +131,9 @@ End3:
 
   // start to write
   ldr r2, [sp, #-44]      // dst ptr
+  
   cmp r4, #2
-  beq WriteCol2
+  bge WriteCol2
   cmp r4, #1
   beq WriteCol1
   b EndWrite

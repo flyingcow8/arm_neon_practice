@@ -7,13 +7,6 @@
 #define UP_DIV(x, y) (((x) + (y) - (1)) / (y))
 #define UP_ROUND(x, y) (((x) + (y) - (1)) / (y) * (y))
 
-#define ROW 5
-#define COL 5
-#define DEPTH 1
-#define ROW4 UP_ROUND(ROW, 4)
-#define COL2 UP_ROUND(COL, 2)
-#define DEPTH16 UP_ROUND(DEPTH, 16)
-
 void MatmulInt8Neon32(const int8_t *a, const int8_t *b, int8_t *dst, int row, int col, int deep16,
                       const int *input_sums, const int *weight_bias, int act_min, int act_max, int out_zp,
                       int multiplier, int left_shift, int right_shift, int stride);
@@ -74,7 +67,14 @@ void Row4x2Major2RowMajor(int8_t *src, int row4, int8_t *dst, int row, int cow) 
   }
 }
 
+#if 0
 void test4x2() {
+#define ROW 5
+#define COL 5
+#define DEPTH 1
+#define ROW4 UP_ROUND(ROW, 4)
+#define COL2 UP_ROUND(COL, 2)
+#define DEPTH16 UP_ROUND(DEPTH, 16)
   int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5};
   int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1};
   int a_sums[ROW4] = {0};
@@ -112,10 +112,17 @@ void test4x2() {
   }
   printf("\n");
 }
+#endif
 
 void test() {
-  int8_t a[ROW * DEPTH] = {1, 2, 3, 4, 5};
-  int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1};
+#define ROW 4
+#define COL 2
+#define DEPTH 1
+#define ROW4 UP_ROUND(ROW, 4)
+#define COL2 UP_ROUND(COL, 2)
+#define DEPTH16 UP_ROUND(DEPTH, 16)
+  int8_t a[ROW * DEPTH] = {1, 2, 3, 4};
+  int8_t b[DEPTH * COL] = {1, 1};
   int a_sums[ROW4] = {0};
   int b_sums[COL2] = {0};
 
