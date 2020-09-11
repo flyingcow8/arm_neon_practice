@@ -8,8 +8,8 @@
 #define UP_ROUND(x, y) (((x) + (y) - (1)) / (y) * (y))
 
 #define ROW 4
-#define COL 2
-#define DEPTH 1
+#define COL 4
+#define DEPTH 2
 #define ROW4 UP_ROUND(ROW, 4)
 #define COL2 UP_ROUND(COL, 2)
 #define DEPTH16 UP_ROUND(DEPTH, 16)
@@ -69,14 +69,14 @@ void Row4x2Major2RowMajor(int8_t *src, int row4, int8_t *dst, int row, int cow) 
     for (int c = 0; c < cow; ++c) {
       int sride_n = c / 2 * (row4 / 4) + r / 4;
       int dst_idx = r * cow + c;
-      dst[dst_idx] = src[stride * sride_n + r % 4 * 4 + c % 2];
+      dst[dst_idx] = src[stride * sride_n + r % 4 * 2 + c % 2];
     }
   }
 }
 
 void test() {
-  int8_t a[ROW * DEPTH] = {1, 2, 3, 4};
-  int8_t b[DEPTH * COL] = {1, 1};
+  int8_t a[ROW * DEPTH] = {1, 1, 2, 2, 3, 3, 4, 4};
+  int8_t b[DEPTH * COL] = {1, 1, 1, 1, 1, 1, 1, 1};
   int a_sums[ROW4] = {0};
   int b_sums[COL2] = {0};
 
@@ -97,21 +97,18 @@ void test() {
 
   MatmulInt8Neon32(a_align, b_align, c, ROW, COL, DEPTH16, a_sums, b_sums, INT_MIN, INT_MAX, 0, multiplier, 0, 0, 0);
 
-#if 0  // test start
-  int8_t c_test[ROW4 * COL4] = {0};
-  Row4x4Major2RowMajor(c, ROW4, COL4, c_test, ROW4, COL4);
-  for (int i = 0; i < ROW4 * COL4; ++i) {
-    printf("%d\t", output[i]);
-    if ((i + 1) % COL4 == 0) printf("\n");
+#if 1  // test start
+  for (int i = 0; i < ROW4 * COL2; ++i) {
+    printf("%d\t", c[i]);
+    if ((i + 1) % COL2 == 0) printf("\n");
   }
   printf("\n");
-  return;
 #endif
 
   Row4x2Major2RowMajor(c, ROW4, output, ROW, COL);
   for (int i = 0; i < ROW * COL; ++i) {
     printf("%d ", output[i]);
-    if ((i + 1) % COL2 == 0) printf("\n");
+    if ((i + 1) % COL == 0) printf("\n");
   }
   printf("\n");
 }

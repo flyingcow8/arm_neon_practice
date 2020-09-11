@@ -59,7 +59,7 @@ L2:
   ble End2
 
   ldr r1, [sp, #4]    // reload b ptr
-  ldr r4, [sp, #28]   // reload weight_bias ptr
+  ldr r7, [sp, #28]   // reload weight_bias ptr
   ldr r5, [sp, #20]   // reset deep16
   vmov.i32 q6, #0
   vmov.i32 q7, #0
@@ -137,6 +137,7 @@ End3:
 End2:
   sub r4, r4, #2  // b col counter -= 2
   add r1, r1, r9  // b ptr + stride
+  str r1, [sp, #4]
   b L1
 
 End1:
