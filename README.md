@@ -27,5 +27,6 @@ https://askubuntu.com/questions/1090351/can-i-run-an-arm32-bit-app-on-an-arm64bi
 
 Do the instructions in the above post in ubuntu aarch64 vm. Then you can run arm 32-bit app on aarch64 platform! 
 
- 
+## How to debug ARM 32-bit app
 
+In ubuntu aarch64 vm, just use gdb to debug.(Maybe you need to install gcc-arm-none-eabi first)
