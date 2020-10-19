@@ -1,7 +1,7 @@
 #include <arm_neon.h>
 #include <stdio.h>
 
-void Matmul1xNFp16Neon64(const float16_t *a, const float16_t *b, float16_t *c, int depth, int col);
+void MatmulFp16Neon64_1xN(const float16_t *a, const float16_t *b, float16_t *c, const float16_t *bias, int act_type, int depth, int col);
 
 void RowMajor2ColMajor(float16_t *src, int row, int col, float16_t *dst) {
   for (int r = 0; r < row; ++r) {
@@ -26,7 +26,7 @@ int main() {
   float16_t bb[60] = {0};
   float16_t c[6] = {0};
   RowMajor2ColMajor(b, 10, 6, bb);
-  Matmul1xNFp16Neon64(a, bb, c, 10, 6);
+  MatmulFp16Neon64_1xN(a, bb, c, NULL, 0, 10, 6);
   for (int i = 0; i < 6; ++i) {
     printf("%f ", (float)c[i]);
   }
